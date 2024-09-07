@@ -1,7 +1,9 @@
 ﻿
+using Marketplace.Framework;
+
 namespace Marketplace.Domain
 {
-    public class ClassifiedAd
+    public class ClassifiedAd : Entity
     {
         public ClassifiedAdId Id { get; private set; }
 
@@ -11,6 +13,10 @@ namespace Marketplace.Domain
             OwnerId = ownerId;
             State = ClassifiedAdState.Inactive;
             EnsureValidState();
+            Apply(new Events.ClassifiedAdCreated{
+                Id = id,
+                OwnerId = ownerId
+            });
         }
 
         public void CreateClassifiedAd(ClassifiedAdId id, UserId ownerId)
@@ -23,15 +29,31 @@ namespace Marketplace.Domain
         {
             Title = title;
             EnsureValidState();
+            Apply(new Events.ClassifiedAdTitleChanged
+            {
+                Id = Id,
+                Title = title.ToString()
+            });
         }
         public void UpdateText(ClassifiedAdText text)
         {
             Text = text;
             EnsureValidState();
+            Apply(new Events.ClassifiedAdTextUpdated
+            {
+                Id = Id,
+                AdText = text.ToString()
+            });
         } 
         public void UpdatePrice(Price price) {
             Price = price;
             EnsureValidState();
+            Apply(new Events.ClassifiedAdPriceUpdated
+            {
+                Id = Id,
+                Price = price.Amount,
+                CurrencyCode = price.Currency.ToString()
+            });
         } 
 
         public void RequestToPublish()
@@ -45,9 +67,13 @@ namespace Marketplace.Domain
 
             State = ClassifiedAdState.PendingRevew;
             EnsureValidState();
+            Apply(new Events.ClassifiedAdSentForReview
+            {
+                Id = Id
+            });
         }
 
-        protected void EnsureValidState()
+        protected override void EnsureValidState()
         {
             var valid =
                 Id != null &&
@@ -70,7 +96,31 @@ namespace Marketplace.Domain
                 throw new InvalidEntityStateException(this, $"Post-checks failed in state {State}");
         }
 
-        public UserId OwnerId { get; }
+        protected override void When(object @event)
+        {
+            switch (@event)
+            {
+                case Events.ClassifiedAdCreated e:
+                    Id = new ClassifiedAdId(e.Id);
+                    OwnerId = new UserId(e.OwnerId);
+                    State = ClassifiedAdState.Inactive;
+                    break;
+                case Events.ClassifiedAdTitleChanged e:
+                    Title = new ClassifiedAdTitle(e.Title);
+                    break;
+                case Events.ClassifiedAdTextUpdated e:
+                    Text = new ClassifiedAdText(e.AdText);
+                    break;
+                case Events.ClassifiedAdPriceUpdated e:
+                    Price = new Price(e.Price, e.CurrencyCode);
+                    break;
+                case Events.ClassifiedAdSentForReview e:
+                    State = ClassifiedAdState.PendingRevew;
+                    break;
+            }
+        }
+
+        public UserId OwnerId { get; private set; }
         public ClassifiedAdTitle Title { get; private set; }
         public ClassifiedAdText Text { get; private set; }
         public Price Price { get; private set; }

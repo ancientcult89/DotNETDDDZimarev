@@ -1,6 +1,6 @@
 ﻿namespace Marketplace.Framework
 {
-    public abstract class Entity<TId> where TId : IEquatable<TId>
+    public abstract class Entity
     {
         private readonly List<object> _events;
 

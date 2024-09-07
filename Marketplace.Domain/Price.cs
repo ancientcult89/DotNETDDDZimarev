@@ -9,6 +9,11 @@
             
         }
 
+        internal Price(decimal amount, string currencyCode)
+            : base(amount, new Currency { CurrencyCode = currencyCode })
+        {
+        }
+
         public new static Price FromDecimal(decimal amount, string currency, ICurrencyLookUp currencyLookup) =>
             new Price(amount, currency, currencyLookup);
     }

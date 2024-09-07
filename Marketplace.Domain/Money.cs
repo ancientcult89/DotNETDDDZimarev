@@ -27,14 +27,14 @@ namespace Marketplace.Domain
             Currency = currency;
         }
 
-        private Money(decimal amount, CurrencyDetails currency)
+        public Money(decimal amount, Currency currency)
         {
             Amount = amount;
             Currency = currency;
         }
 
         public decimal Amount { get; }
-        public CurrencyDetails Currency { get; }
+        public Currency Currency { get; }
 
         public Money Add(Money summand)
         {
