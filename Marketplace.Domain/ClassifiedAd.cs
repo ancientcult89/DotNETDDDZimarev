@@ -32,7 +32,7 @@ namespace Marketplace.Domain
             Apply(new Events.ClassifiedAdTitleChanged
             {
                 Id = Id,
-                Title = title.ToString()
+                Title = title
             });
         }
         public void UpdateText(ClassifiedAdText text)
@@ -42,7 +42,7 @@ namespace Marketplace.Domain
             Apply(new Events.ClassifiedAdTextUpdated
             {
                 Id = Id,
-                AdText = text.ToString()
+                AdText = text
             });
         } 
         public void UpdatePrice(Price price) {
@@ -52,7 +52,7 @@ namespace Marketplace.Domain
             {
                 Id = Id,
                 Price = price.Amount,
-                CurrencyCode = price.Currency.ToString()
+                CurrencyCode = price.Currency
             });
         } 
 
