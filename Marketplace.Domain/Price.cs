@@ -8,5 +8,8 @@
                 throw new ArgumentException("Price cannot be negative", nameof(amount));
             
         }
+
+        public new static Price FromDecimal(decimal amount, string currency, ICurrencyLookUp currencyLookup) =>
+            new Price(amount, currency, currencyLookup);
     }
 }
