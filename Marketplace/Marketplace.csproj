@@ -11,7 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\Marketplace.Domain\Marketplace.Domain.csproj" />
+    <ProjectReference Include="..\Marketplace.Framework\Marketplace.Framework.csproj" />
+    <ProjectReference Include="..\Marketplace.Tests\Marketplace.Tests.csproj" />
   </ItemGroup>
 
 </Project>
