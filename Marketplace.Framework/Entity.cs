@@ -1,7 +1,8 @@
 ﻿namespace Marketplace.Framework
 {
-    public abstract class Entity
+    public abstract class Entity<TId> where TId : Value<TId>
     {
+        public TId Id { get; set; }
         private readonly List<object> _events;
 
         protected Entity() => _events = new List<object>();

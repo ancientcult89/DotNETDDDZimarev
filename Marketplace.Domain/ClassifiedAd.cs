@@ -3,7 +3,7 @@ using Marketplace.Framework;
 
 namespace Marketplace.Domain
 {
-    public class ClassifiedAd : Entity
+    public class ClassifiedAd : Entity<ClassifiedAdId>
     {
         public ClassifiedAdId Id { get; private set; }
 
@@ -28,7 +28,6 @@ namespace Marketplace.Domain
         public void SetTitle(ClassifiedAdTitle title)
         {
             Title = title;
-            EnsureValidState();
             Apply(new Events.ClassifiedAdTitleChanged
             {
                 Id = Id,
@@ -38,7 +37,6 @@ namespace Marketplace.Domain
         public void UpdateText(ClassifiedAdText text)
         {
             Text = text;
-            EnsureValidState();
             Apply(new Events.ClassifiedAdTextUpdated
             {
                 Id = Id,
@@ -47,7 +45,6 @@ namespace Marketplace.Domain
         } 
         public void UpdatePrice(Price price) {
             Price = price;
-            EnsureValidState();
             Apply(new Events.ClassifiedAdPriceUpdated
             {
                 Id = Id,
@@ -58,15 +55,7 @@ namespace Marketplace.Domain
 
         public void RequestToPublish()
         {
-            if (Title == null)
-                throw new InvalidEntityStateException(this, "tittle cannot be empty");
-            if (Text == null)
-                throw new InvalidEntityStateException(this, "text cannot be empty");
-            if (Price?.Amount == 0)
-                throw new InvalidEntityStateException(this, "price cannot be zero");
-
             State = ClassifiedAdState.PendingRevew;
-            EnsureValidState();
             Apply(new Events.ClassifiedAdSentForReview
             {
                 Id = Id
