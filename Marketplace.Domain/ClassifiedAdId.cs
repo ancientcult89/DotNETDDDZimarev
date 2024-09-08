@@ -8,5 +8,6 @@ namespace Marketplace.Domain
 
         public ClassifiedAdId(Guid value) => _value = value;
         public static implicit operator Guid(ClassifiedAdId self) => self._value;
+        public static implicit operator string(ClassifiedAdId self) => self._value.ToString();
     }
 }

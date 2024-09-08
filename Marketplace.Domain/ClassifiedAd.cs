@@ -3,16 +3,17 @@ using Marketplace.Framework;
 
 namespace Marketplace.Domain
 {
-    public class ClassifiedAd : Entity<ClassifiedAdId>
+    public class ClassifiedAd : AggregateRoot<ClassifiedAdId>
     {
         public ClassifiedAdId Id { get; private set; }
+        public List<Picture> Pictures { get; private set; }
 
         public ClassifiedAd(ClassifiedAdId id, UserId ownerId)
         {
             Id = id;
             OwnerId = ownerId;
             State = ClassifiedAdState.Inactive;
-            EnsureValidState();
+            Pictures = new List<Picture>();
             Apply(new Events.ClassifiedAdCreated{
                 Id = id,
                 OwnerId = ownerId
@@ -62,6 +63,19 @@ namespace Marketplace.Domain
             });
         }
 
+        private Picture FindPicture(PictureId pictureId) => Pictures.FirstOrDefault(x => x.Id == pictureId);
+
+        public void ResizePicture(PictureId pictureId, PictureSize newSize)
+        {
+            var picture = FindPicture(pictureId);
+            if (picture == null)
+                throw new InvalidOperationException("Cannot resize a picture that i dont have");
+
+            picture.Resize(newSize);
+        }
+
+        private Picture FirstPicture => Pictures.OrderBy(x => x.Order).FirstOrDefault();
+
         protected override void EnsureValidState()
         {
             var valid =
@@ -72,11 +86,13 @@ namespace Marketplace.Domain
                     ClassifiedAdState.PendingRevew =>
                         Title != null
                         && Text != null
-                        && Price?.Amount > 0,
+                        && Price?.Amount > 0
+                        && FirstPicture.HasCorrectSize(),
                     ClassifiedAdState.Active =>
                         Title != null
                         && Text != null
                         && Price?.Amount > 0
+                        && FirstPicture.HasCorrectSize()
                         && ApprovedBy != null,
                     _ => true
                 });
@@ -106,6 +122,11 @@ namespace Marketplace.Domain
                 case Events.ClassifiedAdSentForReview e:
                     State = ClassifiedAdState.PendingRevew;
                     break;
+                case Events.PictureAddedToAClassifiedAd e:
+                    var newPicture = new Picture(Apply);
+                    ApplyToEntity(newPicture, e);
+                    Pictures.Add(newPicture);
+                    break;
             }
         }
 
@@ -123,5 +144,16 @@ namespace Marketplace.Domain
             Inactive,
             MarkedAsSold,
         }
+
+        public void AddPicture(Uri pictureUri, PictureSize size) =>
+            Apply(new Events.PictureAddedToAClassifiedAd
+            {
+                PictureId = new Guid(),
+                ClassifiedAdId = Id,
+                Url = pictureUri.ToString(),
+                Height = size.Height,
+                Width = size.Width,
+                Order = Pictures.Max(x => x.Order),
+            });
     }
 }

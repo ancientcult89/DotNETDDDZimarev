@@ -1,6 +1,6 @@
 ﻿namespace Marketplace.Framework
 {
-    public abstract class AggregateRoot<TId> where TId : Value<TId>
+    public abstract class AggregateRoot<TId> : IInternalEventHandler where TId : Value<TId>
     {
         public TId Id { get; set; }
         protected abstract void When(object @event);
@@ -20,5 +20,12 @@
         public void ClearChanges() => _changes.Clear();
 
         protected abstract void EnsureValidState();
+
+        protected void ApplyToEntity(IInternalEventHandler entity, object @event) => entity?.Handle(@event);
+
+        public void Handle(object @event)
+        {
+            When(@event);
+        }
     }
 }
