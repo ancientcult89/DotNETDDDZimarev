@@ -7,12 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="RavenDB.Client" Version="6.0.105" />
+    <PackageReference Include="Serilog" Version="4.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Marketplace.Domain\Marketplace.Domain.csproj" />
     <ProjectReference Include="..\Marketplace.Framework\Marketplace.Framework.csproj" />
+    <ProjectReference Include="..\Marketplace.Infrastructure\Marketplace.Infrastructure.csproj" />
     <ProjectReference Include="..\Marketplace.Tests\Marketplace.Tests.csproj" />
   </ItemGroup>
 

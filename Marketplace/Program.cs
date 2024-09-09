@@ -1,19 +1,32 @@
-using Marketplace;
 using Marketplace.Api;
 using Marketplace.Domain;
+using Marketplace.Framework;
+using Marketplace.Infrastructure;
 using Marketplace.Tests;
+using Raven.Client.Documents;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+IDocumentStore store = new DocumentStore
+{
+    Urls = new[] { "http://localhost:8080" },
+    Database = "Marketplace_Chapter8",
+    Conventions =
+        {
+            FindIdentityProperty = m => m.Name == "_databaseId"
+        }
+};
+
+store.Initialize();
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<IClassifiedAdRepository, ClassifiedAdRepository>();
+builder.Services.AddScoped(c => store.OpenAsyncSession());
+builder.Services.AddScoped<IUnitOfWork, RavenDbUnitOfWork>();
+builder.Services.AddScoped<IClassifiedAdRepository, ClassifiedAdRepository>();
 builder.Services.AddSingleton<ICurrencyLookUp, FakeCurrencyLookup>();
-builder.Services.AddSingleton<ClassifiedAdsApplicationService>();
+builder.Services.AddScoped<ClassifiedAdsApplicationService>();
 
 var app = builder.Build();
 

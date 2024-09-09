@@ -2,10 +2,9 @@
 {
     public interface IClassifiedAdRepository
     {
-        Task<bool> Exists(string id);
+        Task<bool> Exists(ClassifiedAdId id);
 
-        Task<ClassifiedAd> Load(string id);
-
-        Task Save(ClassifiedAd entity);
+        Task<ClassifiedAd> Load(ClassifiedAdId id);
+        Task Add(ClassifiedAd entity);
     }
 }
