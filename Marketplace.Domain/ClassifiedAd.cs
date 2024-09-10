@@ -5,15 +5,20 @@ namespace Marketplace.Domain
 {
     public class ClassifiedAd : AggregateRoot<ClassifiedAdId>
     {
+        //RavenDB key
         private string DbId
         {
             get => $"ClassifiedAd/{Id.Value}";
             set { }
         }
+
+        //EFCore key
+        public Guid ClassifiedAdId { get; private set; }
+
         public ClassifiedAdId Id { get; private set; }
         public List<Picture> Pictures { get; private set; }
 
-        protected ClassifiedAd() { }
+        public ClassifiedAd() { }
         public ClassifiedAd(ClassifiedAdId id, UserId ownerId)
         {
             Id = id;
@@ -115,6 +120,12 @@ namespace Marketplace.Domain
                     Id = new ClassifiedAdId(e.Id);
                     OwnerId = new UserId(e.OwnerId);
                     State = ClassifiedAdState.Inactive;
+                    Title = ClassifiedAdTitle.NoTitle;
+                    Text = ClassifiedAdText.NoText;
+                    Price = Price.NoPrice;
+                    ApprovedBy = UserId.NoUser;
+                    //required for persistance
+                    ClassifiedAdId = e.Id;
                     break;
                 case Events.ClassifiedAdTitleChanged e:
                     Title = new ClassifiedAdTitle(e.Title);

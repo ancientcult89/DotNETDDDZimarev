@@ -3,6 +3,7 @@ using Marketplace.Domain;
 using Marketplace.Framework;
 using Marketplace.Infrastructure;
 using Marketplace.Tests;
+using Microsoft.EntityFrameworkCore;
 using Raven.Client.Documents;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,8 +24,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped(c => store.OpenAsyncSession());
-builder.Services.AddScoped<IUnitOfWork, RavenDbUnitOfWork>();
-builder.Services.AddScoped<IClassifiedAdRepository, ClassifiedAdRepository>();
+builder.Services.AddScoped<IUnitOfWork, EFCoreUnitOfWork>();
+builder.Services.AddDbContext<ClassifiedAdDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Marketplace"), o => o.MigrationsAssembly("Marketplace")));
+builder.Services.AddScoped<IClassifiedAdRepository, ClassidfiedAdEFCoreRepository>();
 builder.Services.AddSingleton<ICurrencyLookUp, FakeCurrencyLookup>();
 builder.Services.AddScoped<ClassifiedAdsApplicationService>();
 
@@ -36,6 +38,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+AppBuilderDatabaseExtensions.EnsureDatabase(app.Services);
 
 app.UseHttpsRedirection();
 

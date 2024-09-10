@@ -16,6 +16,8 @@
         {
         }
 
+        public static Price NoPrice = new Price(0, "");
+
         public new static Price FromDecimal(decimal amount, string currency,
             ICurrencyLookUp currencyLookup) =>
             new Price(amount, currency, currencyLookup);

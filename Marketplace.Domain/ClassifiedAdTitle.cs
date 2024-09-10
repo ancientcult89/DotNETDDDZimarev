@@ -11,6 +11,8 @@ namespace Marketplace.Domain
             return new ClassifiedAdTitle(title);
         }
 
+        public static ClassifiedAdTitle NoTitle = new ClassifiedAdTitle("");
+
         public static ClassifiedAdTitle FromHtml(string htmlTitle)
         {
             var supportedTagsReplaced = htmlTitle

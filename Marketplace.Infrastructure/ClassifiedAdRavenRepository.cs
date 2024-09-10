@@ -3,10 +3,10 @@ using Raven.Client.Documents.Session;
 
 namespace Marketplace.Infrastructure
 {
-    public class ClassifiedAdRepository : IClassifiedAdRepository
+    public class ClassifiedAdRavenRepository : IClassifiedAdRepository
     {
         private readonly IAsyncDocumentSession _session;
-        public ClassifiedAdRepository(IAsyncDocumentSession session)
+        public ClassifiedAdRavenRepository(IAsyncDocumentSession session)
         {
             _session = session;
         }
