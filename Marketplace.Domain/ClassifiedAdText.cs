@@ -1,13 +1,20 @@
-﻿namespace Marketplace.Domain
+﻿using Marketplace.Framework;
+
+namespace Marketplace.Domain
 {
-    public class ClassifiedAdText
+    public class ClassifiedAdText : Value<ClassifiedAdText>
     {
-        public static ClassifiedAdText FromString(string title) => new ClassifiedAdText(title);
-        private readonly string _value;
-        internal ClassifiedAdText(string value)
-        {
-            _value = value;
-        }
-        public static implicit operator string(ClassifiedAdText text) => text._value;
+        public string Value { get; private set; }
+
+        internal ClassifiedAdText(string text) => Value = text;
+
+        public static ClassifiedAdText FromString(string text) =>
+            new ClassifiedAdText(text);
+
+        public static implicit operator string(ClassifiedAdText text) =>
+            text.Value;
+
+        // Satisfy the serialization requirements
+        protected ClassifiedAdText() { }
     }
 }

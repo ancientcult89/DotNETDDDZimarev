@@ -2,11 +2,13 @@
 {
     public class Price : Money
     {
-        public Price(decimal amount, string currencyCode, ICurrencyLookUp currencyLookUp) : base(amount, currencyCode, currencyLookUp)
+        private Price(decimal amount, string currencyCode, ICurrencyLookUp currencyLookup)
+            : base(amount, currencyCode, currencyLookup)
         {
             if (amount < 0)
-                throw new ArgumentException("Price cannot be negative", nameof(amount));
-            
+                throw new ArgumentException(
+                    "Price cannot be negative",
+                    nameof(amount));
         }
 
         internal Price(decimal amount, string currencyCode)
@@ -14,7 +16,11 @@
         {
         }
 
-        public new static Price FromDecimal(decimal amount, string currency, ICurrencyLookUp currencyLookup) =>
+        public new static Price FromDecimal(decimal amount, string currency,
+            ICurrencyLookUp currencyLookup) =>
             new Price(amount, currency, currencyLookup);
+
+        // Satisfy the serialization requirements 
+        protected Price() { }
     }
 }

@@ -13,7 +13,7 @@ IDocumentStore store = new DocumentStore
     Database = "Marketplace_Chapter8",
     Conventions =
         {
-            FindIdentityProperty = m => m.Name == "_databaseId"
+            FindIdentityProperty = m => m.Name == "DbId"
         }
 };
 

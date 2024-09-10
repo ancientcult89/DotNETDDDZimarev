@@ -4,42 +4,47 @@ namespace Marketplace.Domain
 {
     public class Money : Value<Money>
     {
-        private const string DefaultCurrency = "EUR";
-        public static Money FromDecimal(decimal amount, string currency, ICurrencyLookUp currencyLookUp) 
-            => new Money(amount, currency, currencyLookUp);
-        public static Money FromString(string amount, string currency, ICurrencyLookUp currencyLookUp) 
-            => new Money(decimal.Parse(amount), currency, currencyLookUp);
+        public static Money FromDecimal(decimal amount, string currency,
+            ICurrencyLookUp currencyLookup) =>
+            new Money(amount, currency, currencyLookup);
 
-        protected Money(decimal amount, string currencyCode, ICurrencyLookUp currencyLookUp)
+        public static Money FromString(string amount, string currency,
+            ICurrencyLookUp currencyLookup) =>
+            new Money(decimal.Parse(amount), currency, currencyLookup);
+
+        protected Money(decimal amount, string currencyCode, ICurrencyLookUp currencyLookup)
         {
-            if(string.IsNullOrEmpty(currencyCode))
-                throw new ArgumentNullException(nameof(currencyCode), "Currency must be specified");
+            if (string.IsNullOrEmpty(currencyCode))
+                throw new ArgumentNullException(
+                    nameof(currencyCode), "Currency code must be specified");
 
-            var currency = currencyLookUp.FindCurrency(currencyCode);
-
+            var currency = currencyLookup.FindCurrency(currencyCode);
             if (!currency.InUse)
                 throw new ArgumentException($"Currency {currencyCode} is not valid");
 
-            if(decimal.Round(amount, currency.DecimalPlaces) != amount)
-                throw new ArgumentOutOfRangeException(nameof(amount), $"Amount in {currencyCode} cannot have more than {currency.DecimalPlaces} decimals");
+            if (decimal.Round(amount, currency.DecimalPlaces) != amount)
+                throw new ArgumentOutOfRangeException(
+                    nameof(amount),
+                    $"Amount in {currencyCode} cannot have more than {currency.DecimalPlaces} decimals");
 
             Amount = amount;
             Currency = currency;
         }
 
-        internal Money(decimal amount, Currency currency)
+        protected Money(decimal amount, Currency currency)
         {
             Amount = amount;
             Currency = currency;
         }
 
-        public decimal Amount { get; }
-        public Currency Currency { get; }
+        public decimal Amount { get; private set; }
+        public Currency Currency { get; private set; }
 
         public Money Add(Money summand)
         {
             if (Currency != summand.Currency)
-                throw new CurrencyMismatchException("Cannot sum amounts with different currencies");
+                throw new CurrencyMismatchException(
+                    "Cannot sum amounts with different currencies");
 
             return new Money(Amount + summand.Amount, Currency);
         }
@@ -47,23 +52,28 @@ namespace Marketplace.Domain
         public Money Subtract(Money subtrahend)
         {
             if (Currency != subtrahend.Currency)
-                throw new CurrencyMismatchException("Cannot substract amounts with different currencies");
+                throw new CurrencyMismatchException(
+                    "Cannot subtract amounts with different currencies");
 
-            return new Money(Amount + subtrahend.Amount, Currency);
+            return new Money(Amount - subtrahend.Amount, Currency);
         }
 
-        public static Money operator + (Money summand1, Money summand2) => summand1.Add(summand2);
-        public static Money operator - (Money minuend, Money subtrahend) => minuend.Subtract(subtrahend);
-        public override string ToString()
-        {
-            return $"{Currency.CurrencyCode} {Amount}";
-        }
+        public static Money operator +(Money summand1, Money summand2) =>
+            summand1.Add(summand2);
+
+        public static Money operator -(Money minuend, Money subtrahend) =>
+            minuend.Subtract(subtrahend);
+
+        public override string ToString() => $"{Currency.CurrencyCode} {Amount}";
+
+        // Satisfy the serialization requirements 
+        protected Money() { }
     }
 
     public class CurrencyMismatchException : Exception
     {
         public CurrencyMismatchException(string message) : base(message)
-        {            
+        {
         }
     }
 }
