@@ -1,4 +1,4 @@
-﻿namespace Marketplace.Domain
+﻿namespace Marketplace.Domain.ClassifiedAd
 {
     public static class Events
     {
@@ -8,7 +8,7 @@
             public Guid OwnerId { get; set; }
         }
 
-        public class  ClassifiedAdTitleChanged
+        public class ClassifiedAdTitleChanged
         {
             public Guid Id { get; set; }
             public string Title { get; set; }

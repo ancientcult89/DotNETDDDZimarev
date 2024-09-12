@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using static Marketplace.Contracts.ClassifiedAds;
+using static Marketplace.ClassifiedAd.ClassifiedAds;
 
-namespace Marketplace.Api
+namespace Marketplace.ClassifiedAd
 {
     [Route("/ad")]
     [ApiController]

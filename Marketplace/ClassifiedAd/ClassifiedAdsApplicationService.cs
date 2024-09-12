@@ -1,8 +1,9 @@
-﻿using Marketplace.Domain;
+﻿using Marketplace.Domain.ClassifiedAd;
+using Marketplace.Domain.Shared;
 using Marketplace.Framework;
-using static Marketplace.Contracts.ClassifiedAds;
+using static Marketplace.ClassifiedAd.ClassifiedAds;
 
-namespace Marketplace.Api
+namespace Marketplace.ClassifiedAd
 {
     public class ClassifiedAdsApplicationService : IApplicationService
     {
@@ -43,7 +44,7 @@ namespace Marketplace.Api
                 new ClassifiedAdId(cmd.Id),
                 new UserId(cmd.OwnerId)
             );
-            await _repository.Add( classifiedAd );
+            await _repository.Add(classifiedAd);
             await _unitOfWork.Commit();
         }
 

@@ -1,7 +1,7 @@
 ﻿using Marketplace.Framework;
 using System.Text.RegularExpressions;
 
-namespace Marketplace.Domain
+namespace Marketplace.Domain.ClassifiedAd
 {
     public class ClassifiedAdTitle : Value<ClassifiedAdTitle>
     {

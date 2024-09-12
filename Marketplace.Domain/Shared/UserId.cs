@@ -1,8 +1,9 @@
-﻿using Marketplace.Framework;
+﻿using Marketplace.Domain.ClassifiedAd;
+using Marketplace.Framework;
 
-namespace Marketplace.Domain
+namespace Marketplace.Domain.Shared
 {
-    public class UserId
+    public class UserId : Value<UserId>
     {
         protected UserId() { }
 

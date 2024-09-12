@@ -1,7 +1,7 @@
-﻿
+﻿using Marketplace.Domain.Shared;
 using Marketplace.Framework;
 
-namespace Marketplace.Domain
+namespace Marketplace.Domain.ClassifiedAd
 {
     public class ClassifiedAd : AggregateRoot<ClassifiedAdId>
     {
@@ -25,7 +25,8 @@ namespace Marketplace.Domain
             OwnerId = ownerId;
             State = ClassifiedAdState.Inactive;
             Pictures = new List<Picture>();
-            Apply(new Events.ClassifiedAdCreated{
+            Apply(new Events.ClassifiedAdCreated
+            {
                 Id = id,
                 OwnerId = ownerId
             });
@@ -54,8 +55,9 @@ namespace Marketplace.Domain
                 Id = Id,
                 AdText = text
             });
-        } 
-        public void UpdatePrice(Price price) {
+        }
+        public void UpdatePrice(Price price)
+        {
             Price = price;
             Apply(new Events.ClassifiedAdPriceUpdated
             {
@@ -63,7 +65,7 @@ namespace Marketplace.Domain
                 Price = price.Amount,
                 CurrencyCode = price.Currency
             });
-        } 
+        }
 
         public void RequestToPublish()
         {
@@ -92,7 +94,7 @@ namespace Marketplace.Domain
             var valid =
                 Id != null &&
                 OwnerId != null &&
-                (State switch
+                State switch
                 {
                     ClassifiedAdState.PendingRevew =>
                         Title != null
@@ -106,7 +108,7 @@ namespace Marketplace.Domain
                         && FirstPicture.HasCorrectSize()
                         && ApprovedBy != null,
                     _ => true
-                });
+                };
 
             if (!valid)
                 throw new InvalidEntityStateException(this, $"Post-checks failed in state {State}");

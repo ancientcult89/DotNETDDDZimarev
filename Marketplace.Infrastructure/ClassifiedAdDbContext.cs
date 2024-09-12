@@ -1,4 +1,4 @@
-﻿using Marketplace.Domain;
+﻿using Marketplace.Domain.ClassifiedAd;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,4 +1,4 @@
-﻿using Marketplace.Domain;
+﻿using Marketplace.Domain.ClassifiedAd;
 
 namespace Marketplace.Infrastructure
 {
@@ -15,6 +15,5 @@ namespace Marketplace.Infrastructure
         public async Task<bool> Exists(ClassifiedAdId id) => await _dbContext.ClassifiedAds.FindAsync(id.Value) != null;
 
         public async Task<ClassifiedAd> Load(ClassifiedAdId id) => await _dbContext.ClassifiedAds.FindAsync(id.Value);
-        private static string EntityId(ClassifiedAdId id) => $"CassifiedAd/{id}";
     }
 }
