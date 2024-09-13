@@ -1,9 +1,11 @@
-using Marketplace.Api;
+using Marketplace.ClassifiedAd;
 using Marketplace.Domain.ClassifiedAd;
 using Marketplace.Domain.Shared;
+using Marketplace.Domain.UserProfile;
 using Marketplace.Framework;
 using Marketplace.Infrastructure;
 using Marketplace.Tests;
+using Marketplace.UserProfile;
 using Microsoft.EntityFrameworkCore;
 using Raven.Client.Documents;
 
@@ -21,15 +23,24 @@ IDocumentStore store = new DocumentStore
 
 store.Initialize();
 
+var purgomalumClient = new PurgomalumClient();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped(c => store.OpenAsyncSession());
-builder.Services.AddScoped<IUnitOfWork, EFCoreUnitOfWork>();
+builder.Services.AddScoped<IUnitOfWork, RavenDbUnitOfWork>();
 builder.Services.AddDbContext<ClassifiedAdDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Marketplace"), o => o.MigrationsAssembly("Marketplace")));
-builder.Services.AddScoped<IClassifiedAdRepository, ClassidfiedAdEFCoreRepository>();
+builder.Services.AddScoped<IClassifiedAdRepository, ClassifiedAdRavenRepository>();
+builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 builder.Services.AddSingleton<ICurrencyLookUp, FakeCurrencyLookup>();
 builder.Services.AddScoped<ClassifiedAdsApplicationService>();
+builder.Services.AddScoped(c
+    => new UserProfileApplicationService(
+        c.GetService<IUserProfileRepository>()
+        , c.GetService<IUnitOfWork>()
+        , text => purgomalumClient.CheckForProfanity(text).GetAwaiter().GetResult())
+    );
 
 var app = builder.Build();
 

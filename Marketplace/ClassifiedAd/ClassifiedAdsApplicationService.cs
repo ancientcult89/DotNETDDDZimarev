@@ -1,7 +1,6 @@
 ﻿using Marketplace.Domain.ClassifiedAd;
 using Marketplace.Domain.Shared;
 using Marketplace.Framework;
-using static Marketplace.ClassifiedAd.ClassifiedAds;
 
 namespace Marketplace.ClassifiedAd
 {
@@ -40,7 +39,7 @@ namespace Marketplace.ClassifiedAd
             if (await _repository.Exists(new ClassifiedAdId(cmd.Id)))
                 throw new InvalidOperationException($"Entity with id {cmd.Id} already exists");
 
-            var classifiedAd = new ClassifiedAd(
+            var classifiedAd = new Marketplace.Domain.ClassifiedAd.ClassifiedAd(
                 new ClassifiedAdId(cmd.Id),
                 new UserId(cmd.OwnerId)
             );
@@ -48,7 +47,7 @@ namespace Marketplace.ClassifiedAd
             await _unitOfWork.Commit();
         }
 
-        private async Task HandleUpdate(Guid classifiedAdId, Action<ClassifiedAd> operation)
+        private async Task HandleUpdate(Guid classifiedAdId, Action<Marketplace.Domain.ClassifiedAd.ClassifiedAd> operation)
         {
             var classifiedAd = await _repository.Load(new ClassifiedAdId(classifiedAdId));
             if (classifiedAd == null)
