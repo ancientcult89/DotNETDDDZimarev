@@ -1,3 +1,4 @@
+using EventStore.ClientAPI;
 using Marketplace.ClassifiedAd;
 using Marketplace.Domain.ClassifiedAd;
 using Marketplace.Domain.Shared;
@@ -24,6 +25,13 @@ IDocumentStore store = new DocumentStore
 store.Initialize();
 
 var purgomalumClient = new PurgomalumClient();
+var esConnection = EventStoreConnection.Create(
+    builder.Configuration.GetConnectionString("EventStore"),
+    ConnectionSettings.Create().KeepReconnecting(),
+    AppDomain.CurrentDomain.FriendlyName
+);
+var esStore = new EsAggregateStore(esConnection);
+builder.Services.AddSingleton<IAggregateStore>(esStore);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
