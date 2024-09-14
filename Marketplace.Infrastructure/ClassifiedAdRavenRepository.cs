@@ -16,6 +16,6 @@ namespace Marketplace.Infrastructure
         public Task<bool> Exists(ClassifiedAdId id) => _session.Advanced.ExistsAsync(EntityId(id));
 
         public Task<ClassifiedAd> Load(ClassifiedAdId id) => _session.LoadAsync<ClassifiedAd>(EntityId(id));
-        private static string EntityId(ClassifiedAdId id) => $"CassifiedAd/{id}";
+        private static string EntityId(ClassifiedAdId id) => $"ClassifiedAd/{id}";
     }
 }

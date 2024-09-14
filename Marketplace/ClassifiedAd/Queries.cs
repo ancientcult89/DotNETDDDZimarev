@@ -31,21 +31,47 @@ namespace Marketplace.ClassifiedAd
             .Take(query.PageSize)
             .PagedList(query.Page, query.PageSize);
 
-        public static Task<List<ClassifiedAdDetails>> Query(this IAsyncDocumentSession session, QueryModels.GetPublicClassifiedAd query) =>
-            (
-                from ad in session.Query<Domain.ClassifiedAd.ClassifiedAd>()
-                where ad.Id.Value == query.ClassifiedAdId
-                let user = RavenQuery.Load<Domain.UserProfile.UserProfile>("UserProfile/" + ad.OwnerId.Value)
-                select new ClassifiedAdDetails()
-                {
-                    ClassifiedAdId = ad.Id.Value,
-                    Title = ad.Title.Value,
-                    Description = ad.Text.Value,
-                    Price = ad.Price.Amount,
-                    CurrencyCode = ad.Price.Currency.CurrencyCode,
-                    SellersDisplayName = user.DisplayName.Value,
-                }
-            ).ToListAsync();
+        //public static Task<ClassifiedAdDetails> Query(this IAsyncDocumentSession session, QueryModels.GetPublicClassifiedAd query) =>
+        //    (
+        //        from ad in session.Query<Domain.ClassifiedAd.ClassifiedAd>()
+        //        where ad.Id.Value == query.ClassifiedAdId
+        //        let user = RavenQuery.Load<Domain.UserProfile.UserProfile>("UserProfile/" + ad.OwnerId.Value)
+        //        select new ClassifiedAdDetails()
+        //        {
+        //            ClassifiedAdId = ad.Id.Value,
+        //            Title = ad.Title.Value,
+        //            Description = ad.Text.Value,
+        //            Price = ad.Price.Amount,
+        //            CurrencyCode = ad.Price.Currency.CurrencyCode,
+        //            SellersDisplayName = user.DisplayName.Value,
+        //        }
+        //    ).SingleAsync();
+
+        public static async Task<ClassifiedAdDetails> Query(this IAsyncDocumentSession session, QueryModels.GetPublicClassifiedAd query)
+        {
+            // Выполняем обычный запрос на получение объявления
+            var ad = await session.LoadAsync<Domain.ClassifiedAd.ClassifiedAd>($"ClassifiedAd/{query.ClassifiedAdId}");
+
+            // Если объявление не найдено, возвращаем null или обрабатываем ошибку
+            if (ad == null)
+            {
+                return null;
+            }
+
+            // Загружаем профиль пользователя
+            var user = await session.LoadAsync<Domain.UserProfile.UserProfile>("UserProfile/" + ad.OwnerId.Value);
+
+            // Возвращаем результат
+            return new ClassifiedAdDetails
+            {
+                ClassifiedAdId = ad.Id.Value,
+                Title = ad.Title.Value,
+                Description = ad.Text.Value,
+                Price = ad.Price.Amount,
+                CurrencyCode = ad.Price.Currency.CurrencyCode,
+                SellersDisplayName = user?.DisplayName?.Value ?? "Unknown"
+            };
+        }
 
         public static Task<List<T>> PagedList<T>(this IRavenQueryable<T> query, int page, int pageSize) => 
             query
