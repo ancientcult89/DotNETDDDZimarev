@@ -5,9 +5,9 @@ using Raven.Client.Documents.Session;
 
 namespace Marketplace.UserProfile
 {
-    public class UserProfileRepository : RavenDbRepository<Domain.UserProfile.UserProfile, UserId>, IUserProfileRepository
+    public class UserProfileRavedDbRepository : RavenDbRepository<Domain.UserProfile.UserProfile, UserId>, IUserProfileRepository
     {
-        public UserProfileRepository(IAsyncDocumentSession session) : base(session, id => $"UserProfile/{id.Value}")
+        public UserProfileRavedDbRepository(IAsyncDocumentSession session) : base(session, id => $"UserProfile/{id.Value}")
         {
         }
 

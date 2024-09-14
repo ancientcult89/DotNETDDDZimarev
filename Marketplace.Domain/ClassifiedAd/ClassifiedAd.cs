@@ -158,10 +158,10 @@ namespace Marketplace.Domain.ClassifiedAd
 
         public enum ClassifiedAdState
         {
-            PendingRevew,
-            Active,
-            Inactive,
-            MarkedAsSold,
+            PendingRevew = 1,
+            Active = 2,
+            Inactive = 3,
+            MarkedAsSold = 4,
         }
 
         public void AddPicture(Uri pictureUri, PictureSize size) =>

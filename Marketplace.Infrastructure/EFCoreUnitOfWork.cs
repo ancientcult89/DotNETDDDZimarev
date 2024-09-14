@@ -4,9 +4,9 @@ namespace Marketplace.Infrastructure
 {
     public class EFCoreUnitOfWork : IUnitOfWork
     {
-        private readonly ClassifiedAdDbContext _dbContext;
+        private readonly MarketPlaceDbContext _dbContext;
 
-        public EFCoreUnitOfWork(ClassifiedAdDbContext dbContext)
+        public EFCoreUnitOfWork(MarketPlaceDbContext dbContext)
         {
             _dbContext = dbContext;
         }

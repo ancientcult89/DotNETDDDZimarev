@@ -8,7 +8,7 @@
             public int PageSize { get; set; }
         }
 
-        public class GetOwnersClassifiedId
+        public class GetOwnersClassifiedAd
         {
             public Guid OwnerId { get; set; }
             public int Page { get; set; }

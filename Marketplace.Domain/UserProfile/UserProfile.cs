@@ -12,6 +12,13 @@ namespace Marketplace.Domain.UserProfile
             set { }
         }
 
+        //EFCore key
+        public Guid UserProfileId { get; private set; }
+        public UserProfile()
+        {
+            
+        }
+
         //Aggregate state properties
         public FullName FullName { get; private set; }
         public DisplayName DisplayName { get; private set; }

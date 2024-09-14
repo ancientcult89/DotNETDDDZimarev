@@ -29,10 +29,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped(c => store.OpenAsyncSession());
-builder.Services.AddScoped<IUnitOfWork, RavenDbUnitOfWork>();
-builder.Services.AddDbContext<ClassifiedAdDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Marketplace"), o => o.MigrationsAssembly("Marketplace")));
-builder.Services.AddScoped<IClassifiedAdRepository, ClassifiedAdRavenRepository>();
-builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
+builder.Services.AddScoped<IUnitOfWork, EFCoreUnitOfWork>();
+builder.Services.AddDbContext<MarketPlaceDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Marketplace"), o => o.MigrationsAssembly("Marketplace")));
+builder.Services.AddScoped<IClassifiedAdRepository, ClassidfiedAdEFCoreRepository>();
+builder.Services.AddScoped<IUserProfileRepository, UserProfileEfRepository>();
 builder.Services.AddSingleton<ICurrencyLookUp, FakeCurrencyLookup>();
 builder.Services.AddScoped<ClassifiedAdsApplicationService>();
 builder.Services.AddScoped(c

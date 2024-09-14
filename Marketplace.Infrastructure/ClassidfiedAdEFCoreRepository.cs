@@ -4,8 +4,8 @@ namespace Marketplace.Infrastructure
 {
     public class ClassidfiedAdEFCoreRepository : IClassifiedAdRepository
     {
-        private readonly ClassifiedAdDbContext _dbContext;
-        public ClassidfiedAdEFCoreRepository(ClassifiedAdDbContext dbContext)
+        private readonly MarketPlaceDbContext _dbContext;
+        public ClassidfiedAdEFCoreRepository(MarketPlaceDbContext dbContext)
         {
             _dbContext = dbContext;
         }
