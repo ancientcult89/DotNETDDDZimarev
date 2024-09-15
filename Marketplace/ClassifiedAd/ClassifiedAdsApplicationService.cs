@@ -6,15 +6,13 @@ namespace Marketplace.ClassifiedAd
 {
     public class ClassifiedAdsApplicationService : IApplicationService
     {
-        private readonly IClassifiedAdRepository _repository;
-        private readonly IUnitOfWork _unitOfWork;
-        private ICurrencyLookUp _currencyLookUp;
+        private readonly ICurrencyLookUp _currencyLookUp;
+        private readonly IAggregateStore _aggregateStore;
 
-        public ClassifiedAdsApplicationService(IClassifiedAdRepository repository, ICurrencyLookUp currencyLookUp, IUnitOfWork unitOfWork)
+        public ClassifiedAdsApplicationService(ICurrencyLookUp currencyLookUp, IAggregateStore aggregateStore)
         {
             _currencyLookUp = currencyLookUp;
-            _repository = repository;
-            _unitOfWork = unitOfWork;
+            _aggregateStore = aggregateStore;
         }
 
         public Task Handle(object command) =>
@@ -36,26 +34,17 @@ namespace Marketplace.ClassifiedAd
 
         private async Task HandleCreate(V1.Create cmd)
         {
-            if (await _repository.Exists(new ClassifiedAdId(cmd.Id)))
+            if (await _aggregateStore.Exists<Domain.ClassifiedAd.ClassifiedAd, ClassifiedAdId>(new ClassifiedAdId(cmd.Id)))
                 throw new InvalidOperationException($"Entity with id {cmd.Id} already exists");
 
             var classifiedAd = new Marketplace.Domain.ClassifiedAd.ClassifiedAd(
                 new ClassifiedAdId(cmd.Id),
                 new UserId(cmd.OwnerId)
             );
-            await _repository.Add(classifiedAd);
-            await _unitOfWork.Commit();
+            await _aggregateStore.Save<Domain.ClassifiedAd.ClassifiedAd, ClassifiedAdId>(classifiedAd);
         }
 
-        private async Task HandleUpdate(Guid classifiedAdId, Action<Marketplace.Domain.ClassifiedAd.ClassifiedAd> operation)
-        {
-            var classifiedAd = await _repository.Load(new ClassifiedAdId(classifiedAdId));
-            if (classifiedAd == null)
-                throw new InvalidOperationException($"Entity with id {classifiedAdId} cannot be found");
-
-            operation(classifiedAd);
-
-            await _unitOfWork.Commit();
-        }
+        private async Task HandleUpdate(Guid classifiedAdId, Action<Marketplace.Domain.ClassifiedAd.ClassifiedAd> update) =>
+            this.HandleUpdate(_aggregateStore, new ClassifiedAdId(classifiedAdId), update);
     }
 }

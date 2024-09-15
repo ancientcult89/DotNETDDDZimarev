@@ -6,15 +6,13 @@ namespace Marketplace.UserProfile
 {
     public class UserProfileApplicationService : IApplicationService
     {
-        private readonly IUserProfileRepository _repository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IAggregateStore _aggregateStore;
         private readonly CheckTextForProfanity _checkText;
 
-        public UserProfileApplicationService(IUserProfileRepository repository, IUnitOfWork unitOfWork, CheckTextForProfanity checkText)
+        public UserProfileApplicationService(IAggregateStore aggregateStore, CheckTextForProfanity checkText)
         {
             _checkText = checkText;
-            _repository = repository;
-            _unitOfWork = unitOfWork;
+            _aggregateStore = aggregateStore;
         }
 
         public async Task Handle(object command)
@@ -22,17 +20,7 @@ namespace Marketplace.UserProfile
             switch (command)
             {
                 case Contracts.V1.RegisterUser cmd:
-                    if (await _repository.Exists(cmd.UserId))
-                        throw new InvalidOperationException($"Entity with id {cmd.UserId} already exists");
-
-                    var userProfile = new Domain.UserProfile.UserProfile(
-                        new UserId(cmd.UserId),
-                        FullName.FromString(cmd.FullName),
-                        DisplayName.FromString(cmd.DisplayName, _checkText)
-                    );
-
-                    await _repository.Add(userProfile);
-                    await _unitOfWork.Commit();
+                    await HandleCreate(cmd);
                     break;
 
                 case Contracts.V1.UpdateUserFullName cmd:
@@ -47,14 +35,21 @@ namespace Marketplace.UserProfile
             }
         }
 
-        private async Task HandleUpdate(Guid userProfileId, Action<Domain.UserProfile.UserProfile> operation)
+        private async Task HandleCreate(Contracts.V1.RegisterUser cmd)
         {
-            var classifiedId = await _repository.Load(userProfileId);
-            if (classifiedId == null)
-                throw new InvalidOperationException($"Entity with id {userProfileId} cannot be found");
+            if (await _aggregateStore.Exists<Domain.UserProfile.UserProfile, UserId>(new UserId(cmd.UserId)))
+                throw new InvalidOperationException($"Entity with id {cmd.UserId} already exists");
 
-            operation( classifiedId);
-            await _unitOfWork.Commit();
+            var userProfile = new Domain.UserProfile.UserProfile(
+                new UserId(cmd.UserId),
+                FullName.FromString(cmd.FullName),
+                DisplayName.FromString(cmd.DisplayName, _checkText)
+            );
+
+            await _aggregateStore.Save<Domain.UserProfile.UserProfile, UserId>(userProfile);
         }
+
+        private async Task HandleUpdate(Guid id, Action<Domain.UserProfile.UserProfile> update) =>
+            this.HandleUpdate(_aggregateStore, new UserId(id), update);
     }
 }
